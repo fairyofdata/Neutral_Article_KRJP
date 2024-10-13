@@ -150,7 +150,8 @@ def preprocess_data(df):
         raise KeyError("The expected columns 'environmental', 'social', and 'governance' are not present in the dataframe.")
 
 # step 1 : load the provided dataset
-file_path = r"C:\esgpage\LLM-ESG-POS\interface\241007_dummy_update.csv"
+# file_path = r"C:\esgpage\LLM-ESG-POS\interface\241007_dummy_update.csv"
+file_path = r"interface/241007_dummy_update.csv"
 # dummy = pd.read_csv(file_path, encoding='euc-kr')
 dummy = pd.read_csv(file_path, encoding='cp949')
 # dummy = pd.read_csv(file_path, encoding='utf-8')
