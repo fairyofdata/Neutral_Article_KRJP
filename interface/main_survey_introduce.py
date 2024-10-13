@@ -45,6 +45,7 @@ from collections import Counter
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from pypfopt import risk_models, BlackLittermanModel, expected_returns
+from st_pages import Page, show_pages, add_page_title
 
 st.set_page_config(
         page_title="ESG 정보 제공 플랫폼",
@@ -52,7 +53,6 @@ st.set_page_config(
         layout="wide",
         initial_sidebar_state="collapsed",
     )
-# st.title('Kwargs')
 
 # 세션 상태를 초기화 
 if 'ndays' not in st.session_state: 
@@ -175,122 +175,7 @@ def plotChart(data): # 외부에서 데이터를 주면 이를 바탕으로 캔�
 
 
 
-def has_changes(sliders):
-    return any(sliders[key] != initial_values[key] for key in sliders)
-
-# 크롤링  필요한 함수 정의
-def setup_webdriver():
-    options = webdriver.ChromeOptions()
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option("useAutomationExtension", False)
-    options.add_argument('--headless')  # UI 없이 실행하기 위한 headless 모드
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    
-    # 서비스 객체를 사용하여 드라이버 초기화
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-    driver.implicitly_wait(3)
-    
-    return driver
-
-# 필요한 함수 정의
-def setup_webdriver():
-    options = webdriver.ChromeOptions()
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option("useAutomationExtension", False)
-    options.add_argument('--headless')  # UI 없이 실행하기 위한 headless 모드
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    
-    # 서비스 객체를 사용하여 드라이버 초기화
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-    driver.implicitly_wait(3)
-    
-    return driver
-
-# URL 생성 함수 정의
-def makePgNum(num):
-    return 1 + 10 * (num - 1)
-
-def makeUrl(search, page):
-    page_num = makePgNum(page)
-    url = f"https://search.naver.com/search.naver?where=news&sm=tab_pge&query={search}&start={page_num}"
-    return url
-
-# 뉴스 크롤링 함수 추가
-def crawl_naver_news(search):
-    driver = setup_webdriver()
-
-    target_article_count = 10
-    collected_article_count = 0
-    current_page = 1
-    naver_urls = []
-
-    while collected_article_count < target_article_count:
-        search_url = makeUrl(search, current_page)
-        driver.get(search_url)
-        time.sleep(1)  # 대기시간 변경 가능
-
-        a_tags = driver.find_elements(By.CSS_SELECTOR, 'a.info')
-
-        for a_tag in a_tags:
-            if collected_article_count >= target_article_count:
-                break
-            a_tag.click()
-            driver.switch_to.window(driver.window_handles[1])
-            time.sleep(3)
-
-            url = driver.current_url
-            if "news.naver.com" in url:
-                naver_urls.append(url)
-                collected_article_count += 1
-
-            driver.close()
-            driver.switch_to.window(driver.window_handles[0])
-
-        current_page += 1
-
-    driver.quit()
-    return fetch_news_contents(naver_urls)
-
-def fetch_news_contents(naver_urls):
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/98.0.4758.102"}
-    news_list = []
-
-    for url in naver_urls:
-        original_html = requests.get(url, headers=headers)
-        html = BeautifulSoup(original_html.text, "html.parser")
-        title_element = html.select_one("div#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
-        title = title_element.get_text(strip=True) if title_element else "No title found"
-        news_list.append((title, url))
-
-    return news_list
-
-# step2-1 : 사용자 입력
-def get_user_input():
-    with st.form(key='interest_form'):
-        # 사용자의 ESG 선호도와 관심 산업군을 입력받는 부분입니다.
-        industry_choices = df_new['industry'].unique().tolist()
-        selected_industries = st.multiselect('관심 산업군을 선택하세요',industry_choices,key='unique_key_for_industries')
-        esg_weights = {}
-        for key in ['environmental', 'social', 'governance']:
-            st.session_state['sliders'][key] = st.slider(key, 0, 10, st.session_state['sliders'][key], 1)
-            esg_weights[key] = st.session_state['sliders'][key]
-        submit_button = st.form_submit_button(label='완료')
-        
-    if submit_button:
-        all_sliders_zero = all(value == 0 for value in st.session_state['sliders'].values())
-        if not selected_industries or all_sliders_zero:
-            st.warning('슬라이더 값을 변경하여 주십시오.')
-        else:
-            st.write(' ')
-            st.write(' ')
-            return esg_weights, selected_industries
-    return esg_weights, selected_industries
-
-# Step 3: 기업 추천
+# 기업 추천
 def recommend_companies(esg_weights, selected_industries, df):
     # 전처리된 데이터에서 사용자의 ESG 선호도 가중치를 반영하여 최종 점수 계산
     df['final_score'] = (
@@ -358,12 +243,6 @@ def calculate_portfolio_weights(df, esg_weights):
 
     return cleaned_weights, (expected_return, expected_volatility, sharpe_ratio)
 
-
-# with st.sidebar:
-#     selected = option_menu("메뉴", ['설문 설명','설문 페이지','ESG 소개', '방법론','최근 뉴스'], 
-#         icons=['bi bi-house','bi bi-house','bi bi-globe2','bi bi-map', 'bi bi-newspaper']
-#         , menu_icon="cast", default_index=0)
-
 with st.sidebar:
     st.page_link('main_survey_introduce.py', label='홈', icon="🎯")
     st.page_link('pages/survey_page.py', label='설문', icon="📋")
@@ -371,16 +250,13 @@ with st.sidebar:
     st.page_link('pages/recent_news.py', label='최신 뉴스',icon="🆕")
     st.page_link('pages/esg_introduce.py', label='ESG 소개 / 투자 방법', icon="🧩")
 
-# page=st.session_state
-
-# 초기 페이지
-# if selected == '설문 설명':
 
 st.markdown('''<div>
                     <h2 style="font-size:40px; text-align:center;">ESG 평가기관 선호도 설문</h2>
                 </div>
                 ''',unsafe_allow_html=True)
 _,start_page,_ = st.columns([1,2,1])
+
 with start_page:
     st.markdown('''
                 <!DOCTYPE html>
