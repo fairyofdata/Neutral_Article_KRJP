@@ -153,8 +153,8 @@ def preprocess_data(df):
 file_path = r"C:\esgpage\LLM-ESG-POS\interface\241007_dummy_update.csv"
 # dummy = pd.read_csv(file_path, encoding='euc-kr')
 # dummy = pd.read_csv(file_path, encoding='cp949')
-dummy = pd.read_csv(file_path, encoding='utf-8')
-# dummy = pd.read_csv(file_path)
+# dummy = pd.read_csv(file_path, encoding='utf-8')
+dummy = pd.read_csv(file_path)
 df_new = preprocess_data(dummy)        
 # df_new = dummy.copy()
 # df_new = df_new.dropna(axis=1, how='any')
