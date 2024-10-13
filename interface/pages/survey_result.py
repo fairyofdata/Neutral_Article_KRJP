@@ -522,7 +522,7 @@ with col2:
         top_companies = top_companies.sort_values(by='Weight', ascending=False)
         for i, row in top_companies.iterrows():
             weight_percent = row['Weight']
-            if weight_percent >= 5:
+            if weight_percent >= 1:
                 weight_percent = round(weight_percent, 2)
                 st.markdown( f'''
                     <ul style="font-size:17px; letter-spacing: 1.3px;">
