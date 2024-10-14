@@ -507,7 +507,6 @@ with col2:
             height=400,
         )
         
-        
         clicked_points = plotly_events(fig, click_event=True,key="company_click")
         
     with col4:
