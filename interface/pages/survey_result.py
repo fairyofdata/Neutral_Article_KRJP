@@ -62,7 +62,7 @@ with st.sidebar:
     st.page_link('pages/recent_news.py', label='최신 뉴스',icon="🆕")
     st.page_link('pages/esg_introduce.py', label='ESG 소개 / 투자 방법', icon="🧩")
 
-os.environ['JAVA_HOME'] = 'C:\Program Files\Java\jdk-11.0.16.1\bin' 
+os.environ['JAVA_HOME'] = 'C:\Program Files\Java\jdk-11.0.16.1' 
 
 if 'ndays' not in st.session_state: 
     # 세션 상태에 이미 등록되어 있지 않으면 100일로 초기화 하도록 함
