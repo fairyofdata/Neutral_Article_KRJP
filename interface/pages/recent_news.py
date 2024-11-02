@@ -47,6 +47,13 @@ import unicodedata
 import matplotlib.pyplot as plt
 from pypfopt import risk_models, BlackLittermanModel, expected_returns
 
+st.set_page_config(
+        page_title="ESG 정보 제공 플랫폼",
+        page_icon=":earth_africa:",
+        layout="wide",
+        initial_sidebar_state="collapsed",
+    )
+
 # 크롤링  필요한 함수 정의
 def setup_webdriver():
     options = webdriver.ChromeOptions()
@@ -134,7 +141,7 @@ st.markdown('''
             <h1 style="font-size:35px;text-align:center;font-weight:bold;">최신 뉴스</h1>
             ''',unsafe_allow_html=True)
 st.markdown('''
-            <h1 style="font-size:15px;text-align:center;">원하는 주제의 최신 뉴스를 검색해보세요.</h1>
+            <h1 style="font-size:15px;text-align:center;">궁금한 키워드를 검색해보세요.</h1>
             ''', unsafe_allow_html=True)
 # 버튼 클릭 시 크롤링 시작
 
