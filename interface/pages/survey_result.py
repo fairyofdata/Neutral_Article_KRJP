@@ -100,10 +100,10 @@ for key in ['environmental', 'social', 'governance']:
         st.session_state['sliders'][key] = 0
         
 # MongoDB 연결 설정
-load_dotenv()
-client = os.getenv("mongodb_url")
-db = client['kwargs']
-collection = db['kwargs']
+# load_dotenv()
+# client = os.getenv("mongodb_url")
+# db = client['kwargs']
+# collection = db['kwargs']
 
 st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
 st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
