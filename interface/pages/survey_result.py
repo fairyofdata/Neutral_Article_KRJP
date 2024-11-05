@@ -101,7 +101,8 @@ for key in ['environmental', 'social', 'governance']:
         st.session_state['sliders'][key] = 0
         
 # MongoDB 연결 설정
-client = MongoClient("mongodb+srv://tlsgofl0404:Xfce0WwgjDGFx7YH@kwargs.9n9kn.mongodb.net/?retryWrites=true&w=majority&appName=kwargs")
+mongo_uri = os.environ.get('MONGODB_URI')
+client =  MongoClient(mongo_uri)
 db = client['kwargs']
 collection = db['kwargs']
 
@@ -306,7 +307,6 @@ def calculate_portfolio_weights(df, esg_weights, user_investment_style):
     valid_tickers = price_data.columns.tolist()
     df_valid = df[df['ticker'].isin(valid_tickers)]
     # 사용자 ESG 점수를 투자자의 견해로 반영 (Q: 주관적 수익률 벡터)
-    # P = np.eye(len(tickers))
     P = np.eye(len(valid_tickers))
     Q = df_valid['adjusted_esg_score'].values  # Q 벡터: 각 자산에 대한 투자자의 의견 (ESG 점수 반영)
     # Black-Litterman 모델 적용
@@ -960,18 +960,14 @@ with col_3:
                             <h2 style="font-size: 20px; text-align:center;">{clicked_company}&ensp;워드 클라우드</h2>
                             </div>
                 """, unsafe_allow_html=True)
-                # MongoDB에서 Company 필드의 고유 값들을 불러오기
+        # MongoDB에서 Company 필드의 고유 값들을 불러오기
         company_list = collection.distinct('Company')
-        # st.write(company_list)
             
-            # 유니코드 정규화를 사용해 clicked_company와 company_list 값을 동일한 형식으로 변환
+        # 유니코드 정규화를 사용해 clicked_company와 company_list 값을 동일한 형식으로 변환
         clicked_company_normalized = unicodedata.normalize('NFC', clicked_company)
 
-                # 리스트 내의 각 값을 정규화 후 비교
+        # 리스트 내의 각 값을 정규화 후 비교
         clicked_company = next((company for company in company_list if unicodedata.normalize('NFC', company) == clicked_company_normalized), None)
-
-                # MongoDB에서 Company_ID 입력을 받아 해당 데이터를 불러오기
-                # 선택된 Company에 대한 제목들을 가져오기
         titles = collection.find({'Company': clicked_company}, {'_id': 0, 'title': 1})
 
 # 불러온 데이터 리스트로 저장

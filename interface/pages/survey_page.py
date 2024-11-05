@@ -4,33 +4,16 @@ import requests
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service  # Service 클래스 임포트
 import pandas as pd
-import streamlit as st
 from streamlit_option_menu import option_menu
 import streamlit.components.v1 as html
-import FinanceDataReader as fdr
-import mplfinance as mpf
-from datetime import datetime, timedelta
-import json
-import yaml
 import streamlit_authenticator as stauth
 import numpy as np
-import requests as rq
 from streamlit_authenticator.utilities.hasher import Hasher
 import os.path
 import pickle as pkle
 from streamlit_js_eval import streamlit_js_eval
 from passlib.context import CryptContext
-import matplotlib.pyplot as plt
-from pypfopt import EfficientFrontier, risk_models, expected_returns
-import yfinance as yf
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from streamlit_plotly_events import plotly_events
-from cvxopt import matrix, solvers
 from streamlit_authenticator.utilities import (CredentialsError,
                                                ForgotError,
                                                Hasher,
@@ -39,12 +22,6 @@ from streamlit_authenticator.utilities import (CredentialsError,
                                                ResetError,
                                                UpdateError)
 from streamlit_extras.switch_page_button import switch_page
-from pymongo import MongoClient
-from konlpy.tag import Okt
-from collections import Counter
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-from pypfopt import risk_models, BlackLittermanModel, expected_returns
 
 st.set_page_config(
     page_title = "설문 조사",
@@ -53,10 +30,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# with st.sidebar:
-#     selected = option_menu("메뉴", ['홈','ESG 소개', '방법론','최근 뉴스'], 
-#         icons=['bi bi-house','bi bi-globe2','bi bi-map', 'bi bi-newspaper']
-#         , menu_icon="cast", default_index=0)
 with st.sidebar:
     st.page_link('main_survey_introduce.py', label='홈', icon="🎯")
     st.page_link('pages/survey_page.py', label='설문', icon="📋")
@@ -67,55 +40,6 @@ with st.sidebar:
 st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
 st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
 values = {'msci': 0, 'iss': 0, 'sustain': 0, 'sandp': 0, 'esg1': 0}
-
-# 전처리 함수 정의
-def preprocess_data(df):
-    # 기존 컬럼명을 사용할 수 있도록 유효성을 확인
-    if 'environmental' in df.columns and 'social' in df.columns and 'governance' in df.columns:
-        # ESG 영역 비중을 백분율로 환산
-        df['env_percent'] = df['environmental'] / (df['environmental'] + df['social'] + df['governance'])
-        df['soc_percent'] = df['social'] / (df['environmental'] + df['social'] + df['governance'])
-        df['gov_percent'] = df['governance'] / (df['environmental'] + df['social'] + df['governance'])
-
-        # 각 영역별 최종 점수 계산 (average_label 필요)
-        df['env_score'] = df['average_label'] * df['env_percent']
-        df['soc_score'] = df['average_label'] * df['soc_percent']
-        df['gov_score'] = df['average_label'] * df['gov_percent']
-
-        # 연도별 가중치 설정
-        latest_year = df['Year'].max()
-        year_weights = {
-            latest_year: 0.5,
-            latest_year - 1: 0.25,
-            latest_year - 2: 0.125,
-            latest_year - 3: 0.0625,
-            latest_year - 4: 0.0625
-        }
-
-        # 가중치를 반영한 각 영역별 점수 합산
-        df['environmental'] = df.apply(lambda x: x['env_score'] * year_weights.get(x['Year'], 0), axis=1)
-        df['social'] = df.apply(lambda x: x['soc_score'] * year_weights.get(x['Year'], 0), axis=1)
-        df['governance'] = df.apply(lambda x: x['gov_score'] * year_weights.get(x['Year'], 0), axis=1)
-
-        # 동일 기업의 연도별 점수를 합산하여 최종 점수 도출
-        final_df = df.groupby(['Company', 'industry', 'ticker']).agg({
-            'environmental': 'sum',
-            'social': 'sum',
-            'governance': 'sum'
-        }).reset_index()
-
-        return final_df
-    else:
-        raise KeyError("The expected columns 'environmental', 'social', and 'governance' are not present in the dataframe.")
-
-# 답변에 따른 가중치 리턴 함수
-def evaluate_care_level(care_level):
-    if care_level == '신경 쓴다.':
-        return 1
-    elif care_level == '보통이다.':
-        return 0.5
-    elif care_level == '신경 쓰지 않는다.':
-        return 0
 
 with st.form('usersurvey',clear_on_submit=False):
 # 설문지 제목
