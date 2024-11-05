@@ -52,9 +52,8 @@ import pdfkit
 from pdfkit.api import configuration
 import tempfile
 from  streamlit_vertical_slider import vertical_slider
-from plotly.io import to_image
-from io import StringIO, BytesIO
 import base64
+from dotenv import load_dotenv
 
 st.set_page_config(
     page_title = "설문 조사 결과",
@@ -101,8 +100,8 @@ for key in ['environmental', 'social', 'governance']:
         st.session_state['sliders'][key] = 0
         
 # MongoDB 연결 설정
-mongo_uri = os.environ.get('MONGODB_URI')
-client =  MongoClient(mongo_uri)
+load_dotenv()
+client = os.getenv("mongo_url")
 db = client['kwargs']
 collection = db['kwargs']
 
