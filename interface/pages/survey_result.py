@@ -392,7 +392,7 @@ def display_text_on_hover(hover_text, i, origin_text):
     # 동적 HTML 및 CSS를 콘텐츠 컨테이너에 작성
     st.markdown(f'<p>{text_hover}{tooltip_css}</p>', unsafe_allow_html=True)
 
-st.markdown(f'''<h1 style="text-align:center;font-size:32px;padding:0px;margin:10px;">{user_name}을 위한 ESG 중심 포트폴리오 제안서 <br></h1>''',unsafe_allow_html=True)
+# st.markdown(f'''<h1 style="text-align:center;font-size:32px;padding:0px;margin:10px;">{user_name}을 위한 ESG 중심 포트폴리오 제안서 <br></h1>''',unsafe_allow_html=True)
 
 # col1, col2 = st.columns([1,4])
 col1, col2, col3, col4 = st.columns([1,3,1,1])
@@ -581,6 +581,8 @@ top_companies = df_new[df_new['ticker'].isin(portfolio_weights)].copy()
 total_weight = sum(portfolio_weights.values())
 top_companies['Weight'] = top_companies['ticker'].map(portfolio_weights)
 top_companies['Weight'] = top_companies['Weight'] * 100
+
+
 
 # cvxopt 적용 버전
 # portfolio_weights, portfolio_performance = calculate_portfolio_weights(top_companies)
