@@ -101,7 +101,7 @@ for key in ['environmental', 'social', 'governance']:
         
 # MongoDB 연결 설정
 load_dotenv()
-client = os.getenv("mongo_url")
+client = os.getenv("mongodb_url")
 db = client['kwargs']
 collection = db['kwargs']
 
