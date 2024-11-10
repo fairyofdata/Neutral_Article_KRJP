@@ -1,4 +1,4 @@
-Alert: This is Ongoing Project
+⚠️Alert: This is Ongoing Project
 
 # 한일 관계 뉴스 크롤링 및 중립 기사 생성 서비스
 
